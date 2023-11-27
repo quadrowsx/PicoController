@@ -16,7 +16,7 @@ public class PicovrLaunchPlayer {
     private final Intent mIntent;
     private String mUri;
 
-    private boolean isExist(String filePath) {
+    public boolean isExist(String filePath) {
         return new File(filePath).exists();
     }
 
@@ -28,8 +28,8 @@ public class PicovrLaunchPlayer {
         mUri = isExist(videoPath) ? Uri.fromFile(new File(videoPath)).toString() : videoPath;
         if (!isEncrypted) {
             if (isExist(videoPath)) {
-                int videoType = VideoTypeUtils.getVideoType(videoPath);
-                mIntent.putExtra("videoType", String.valueOf(videoType));
+                //int videoType = VideoTypeUtils.getVideoType(videoPath);
+                mIntent.putExtra("videoType", "2");
             }
         }
         mIntent.putExtra("uri", mUri);

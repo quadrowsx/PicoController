@@ -16,21 +16,18 @@ public class VideoTypeUtils {
     private static MediaMetadataRetriever retriever;
 
     public static int getVideoType(String videoPath) {
-        // File video = new File(videoPath);
-        retriever = new MediaMetadataRetriever();
+        MediaMetadataRetriever retriever = new MediaMetadataRetriever();
         retriever.setDataSource(videoPath);
-        int height = Integer.parseInt(retriever.extractMetadata(
-                MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT)); // video height
-        int width = Integer.parseInt(retriever.extractMetadata(
-                MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH)); // video width
+        int height = Integer.parseInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT));
+        int width = Integer.parseInt(retriever.extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH));
         Log.d(TAG, "height:" + height + "***width:" + width);
-        DecimalFormat df = new DecimalFormat("0.0");
-        float radio = Float.parseFloat(df.format((float) width / height));
-        Log.d(TAG, "radio = " + radio);
+        float ratio = (float) width / height;
+        Log.d(TAG, "ratio = " + ratio);
         Bitmap bitmap = retriever.getFrameAtTime();
         Float[] compareResultArray = fuzzyCompareImage(bitmap);
-        int videoType = getType(radio, compareResultArray[0],
-                compareResultArray[1]);
+        int videoType = getType(ratio, compareResultArray[0], compareResultArray[1]);
+
+        Log.d(TAG, "videoType = " + videoType);
         return videoType;
     }
 
@@ -42,19 +39,18 @@ public class VideoTypeUtils {
      */
     private static Float[] fuzzyCompareImage(Bitmap bitmap) {
         Bitmap zoomBimtap = zoomImage(bitmap, 8, 8);
-        List<Bitmap> horizontalBitmaps = ImageSplitter
-                .splitHorizontal(zoomBimtap);
-        String horizontalSimilarity = FuzzyBitmapCompare
-                .similarity(horizontalBitmaps.get(0), horizontalBitmaps.get(1));
+        List<Bitmap> horizontalBitmaps = ImageSplitter.splitHorizontal(zoomBimtap);
+        String horizontalSimilarity = FuzzyBitmapCompare.similarity(horizontalBitmaps.get(0), horizontalBitmaps.get(1));
         List<Bitmap> verticalBitmaps = ImageSplitter.splitVertical(zoomBimtap);
         String verticalSimilarity = FuzzyBitmapCompare
                 .similarity(verticalBitmaps.get(0), verticalBitmaps.get(1));
         Log.i(TAG, "HorizontalSimilarity：" + horizontalSimilarity + "***verticalSimilarity："
                 + verticalSimilarity);
-        float horizontalSimilarityFloat = Float.parseFloat(horizontalSimilarity
+        float horizontalSimilarityFloat = Float.parseFloat(horizontalSimilarity.replace(',', '.')
                 .substring(0, horizontalSimilarity.length() - 1));
-        float verticalSimilarityFloat = Float.parseFloat(verticalSimilarity
+        float verticalSimilarityFloat = Float.parseFloat(verticalSimilarity.replace(',', '.')
                 .substring(0, verticalSimilarity.length() - 1));
+
         return new Float[]{horizontalSimilarityFloat,
                 verticalSimilarityFloat};
     }
